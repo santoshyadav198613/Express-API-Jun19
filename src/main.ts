@@ -5,6 +5,7 @@ import { userRoute } from './route/user';
 import { todoRoute } from './route/todo';
 import bodyParser from 'body-parser';
 import { config } from 'dotenv';
+import { createLogger, transports } from 'winston';
 
 const app = express();
 config();
@@ -16,15 +17,41 @@ app.use(function (req, res, next) {
         "GET, POST, PUT, OPTIONS, DELETE");
     next();
 });
+const logger = createLogger({
+    transports: [
+        new transports.Console(),
+        new transports.File({ filename: 'server.log' })
+    ]
+});
+
 
 app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use(bodyParser.json());
 
+
+// function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
+//     if (res.headersSent) {
+//         return next(err)
+//     }
+//     res.status(500).json({ error: err })
+// }
+// app.use(errorHandler);
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+    logger.log({
+        level: 'info',
+        message: JSON.stringify(req.body)
+    });
+
+    next();
+});
+
 app.get('/', (req: Request, res: Response, next: NextFunction) => {
     console.log(req.body);
     res.json('get call');
 });
+
 
 app.use('/api/v1/user', userRoute);
 

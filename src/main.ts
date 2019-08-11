@@ -6,6 +6,8 @@ import { todoRoute } from './route/todo';
 import bodyParser from 'body-parser';
 import { config } from 'dotenv';
 import { createLogger, transports } from 'winston';
+import helmet from 'helmet';
+import compression from 'compression';
 
 const app = express();
 config();
